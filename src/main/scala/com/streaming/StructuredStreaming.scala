@@ -1,11 +1,16 @@
 package com.streaming
 
+import java.io.File
+
 import com.typesafe.config.ConfigFactory
+import org.apache.commons.io.FileUtils
 import org.apache.log4j.LogManager
 
-import org.apache.spark.sql.SparkSession
+import org.apache.spark.scheduler.{SparkListener, SparkListenerTaskEnd}
+import org.apache.spark.sql.{Encoders, SparkSession}
 import org.apache.spark.sql.streaming.OutputMode
-import org.apache.spark.sql.types.StructType
+
+case class TestRecord(column1: Int, column2: Int)
 
 object StructuredStreaming {
 
@@ -15,6 +20,12 @@ object StructuredStreaming {
   def main(args: Array[String]): Unit = {
     val homeDir = System.getProperty("user.home")
     val jobDataDir = homeDir + "/jobdata"
+    val inDir = jobDataDir + "/in"
+    val outDir = jobDataDir + "/out"
+    val checkpointDir = jobDataDir + "/checkpoint"
+
+    FileUtils.deleteDirectory(new File(outDir))
+    FileUtils.deleteDirectory(new File(checkpointDir))
 
     log.info("Creating spark session...")
     val spark = SparkSession.builder()
@@ -23,19 +34,24 @@ object StructuredStreaming {
       .getOrCreate()
     log.info("OK")
 
-    val schema = new StructType()
-      .add("column1", "integer")
-      .add("column2", "integer")
+    spark.sparkContext.addSparkListener(new SparkListener() {
+      override def onTaskEnd(taskEnd: SparkListenerTaskEnd) {
+        log.info("Status: " + taskEnd.taskInfo.status)
+        log.info("RecordsRead: " + taskEnd.taskMetrics.inputMetrics.recordsRead)
+        log.info("RecordsWritten: " + taskEnd.taskMetrics.outputMetrics.recordsWritten)
+        log.info("Accumulables: " + taskEnd.taskInfo.accumulables)
+      }
+    })
 
     val writeStream = spark
       .readStream
-      .schema(schema)
-      .csv(jobDataDir + "/in")
+      .schema(Encoders.product[TestRecord].schema)
+      .csv(inDir)
       .writeStream
       .outputMode(OutputMode.Append)
       .format("parquet")
-      .option("path", jobDataDir + "/out")
-      .option("checkpointLocation", jobDataDir + "/checkpoint")
+      .option("path", outDir)
+      .option("checkpointLocation", checkpointDir)
       .start()
 
     log.info("Waiting for termination...")
