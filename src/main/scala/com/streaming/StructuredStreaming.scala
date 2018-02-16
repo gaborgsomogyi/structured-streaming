@@ -2,7 +2,6 @@ package com.streaming
 
 import java.io.File
 
-import com.typesafe.config.ConfigFactory
 import org.apache.commons.io.FileUtils
 import org.apache.log4j.LogManager
 
@@ -15,7 +14,6 @@ case class TestRecord(column1: Int, column2: Int)
 object StructuredStreaming {
 
   @transient lazy val log = LogManager.getLogger(getClass)
-  @transient lazy val appConf = ConfigFactory.load()
 
   def main(args: Array[String]): Unit = {
     val homeDir = System.getProperty("user.home")

@@ -45,12 +45,6 @@
         </dependency>
 
         <dependency>
-            <groupId>com.typesafe</groupId>
-            <artifactId>config</artifactId>
-            <version>${typesafe.version}</version>
-        </dependency>
-
-        <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
             <version>1.6.4</version>
@@ -109,12 +103,6 @@
                                     <groupId>org.apache.spark</groupId>
                                     <artifactId>spark-streaming_${scala.version}</artifactId>
                                     <version>${spark.version}</version>
-                                </artifactItem>
-
-                                <artifactItem>
-                                    <groupId>com.typesafe</groupId>
-                                    <artifactId>config</artifactId>
-                                    <version>${typesafe.version}</version>
                                 </artifactItem>
                             </artifactItems>
                             <outputDirectory>${project.build.directory}/lib</outputDirectory>
