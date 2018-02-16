@@ -115,7 +115,8 @@
                                     <groupId>com.typesafe</groupId>
                                     <artifactId>config</artifactId>
                                     <version>${typesafe.version}</version>
-                                </artifactItem>                            </artifactItems>
+                                </artifactItem>
+                            </artifactItems>
                             <outputDirectory>${project.build.directory}/lib</outputDirectory>
                             <overWriteIfNewer>true</overWriteIfNewer>
                         </configuration>
